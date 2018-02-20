@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>App Reserva Vuelo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css" />
+  </head>
+  <body>
+       <div id="app"  class="container">
+         <div class="jumbotron">
+            <h1>tuvuelo.com</h1>
+          </div>
+         <ul class="nav nav-tabs">
+           <li  v-bind:class="{'active' :('tbinicio' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbinicio'">Inicio</a></li>
+           <li v-bind:class="{'active' :('tbvuelos' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbvuelos';initConsultaVuelos();" >Consultar Vuelos</a></li>
+           <li v-bind:class="{'active' :('tbreserva' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbreserva'" >Consultar Reserva</a></li>
+        </ul>
+        <!--- tab bienvenida -->
+        <div id="div_inicio" v-if="('tbinicio' === tabActiva)" class="panel panel-default">
+          <div class="panel-body"> <p>El mejor sitio para para reservar tus vuelos a donde quieras y al mejor precio.</p></div>
+        </div>
+        <!--- tab vuelos -->
+        <div id="div_vuelos" v-if="('tbvuelos' === tabActiva)" class="panel panel-default">
+          <div class="panel-body">
+            <span class="label label-default">Ciudad Origen</span>
+            <select class="" name="ciudadOrigen" v-model="ciudadOrigen">
+              <option></option>
+              <option v-if="listaTarifaVuelos" v-for="obtv in listaTarifaVuelos" v-bind:value="obtv.ciudadOrigen">
+                      {{obtv.ciudadOrigen}}
+              </option>
+            </select>
+            <span class="label label-default">Ciudad Destino</span>
+            <select class="" name="ciudadDestino" v-model="ciudadDestino">
+              <option></option>
+              <option v-if="listaTarifaVuelos" v-for="obtv in listaTarifaVuelos" v-bind:value="obtv.ciudadDestino">
+                      {{obtv.ciudadDestino}}
+              </option>
+            </select>
+           <span class="label label-default">Fecha</span></span><input id="date" type="date" v-model = "fechaVuelo">
+           <button type="button" name="button" v-on:click ="consultarVuelos()">Consultar</button>
+           <div v-if="listaVuelos" >
+             <table class="table">
+                <thead>
+                  <tr>
+                    <th>Codigo</th>
+                    <th>Duracion(Minutos)</th>
+                    <th>Hora</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="vuelo in listaVuelos">
+                    <td>{{vuelo.id +"-"+vuelo.numeroAvion}}</td>
+                    <td>{{vuelo.tiempoDuracionMinutos}}</td>
+                    <td>{{vuelo.hora}}</td>
+                  </tr>
+
+                </tbody>
+              </table>
+           </div>
+                 
+          </div>
+        </div>
+        <!--- tab reservas -->
+        <div id="div_reserva"  v-if="('tbreserva' === tabActiva)" class="panel panel-default">
+          <div class="panel-body"> <p>reservas.</p></div>
+        </div>
+
+       </div>
+
+
+
+
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+  <script src="js/app.js"></script>
+</html>
