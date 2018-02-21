@@ -11,9 +11,9 @@
             <h1>tuvuelo.com</h1>
           </div>
          <ul class="nav nav-tabs">
-           <li  v-bind:class="{'active' :('tbinicio' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbinicio'">Inicio</a></li>
+           <li  v-bind:class="{'active' :('tbinicio' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbinicio';limpiar();">Inicio</a></li>
            <li v-bind:class="{'active' :('tbvuelos' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbvuelos';initConsultaVuelos();" >Consultar Vuelos</a></li>
-           <li v-bind:class="{'active' :('tbreserva' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbreserva'" >Consultar Reserva</a></li>
+           <li v-bind:class="{'active' :('tbreserva' === tabActiva)}"><a href="#" v-on:click="tabActiva='tbreserva'; limpiar();" >Consultar Reserva</a></li>
         </ul>
         <!--- tab bienvenida -->
         <div id="div_inicio" v-if="('tbinicio' === tabActiva)" class="panel panel-default">
@@ -42,27 +42,138 @@
              <table class="table">
                 <thead>
                   <tr>
+                    <th>&nbsp;</th>
                     <th>Codigo</th>
-                    <th>Duracion(Minutos)</th>
+                    <th>Duraci&oacute;n(Minutos)</th>
                     <th>Hora</th>
+                    <th>Precio</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="vuelo in listaVuelos">
+                    <td><input name="1" type="radio" v-on:click="vueloReserva = vuelo" v-bind:checked="vuelo.id === vueloReserva.id"></td>
                     <td>{{vuelo.id +"-"+vuelo.numeroAvion}}</td>
                     <td>{{vuelo.tiempoDuracionMinutos}}</td>
                     <td>{{vuelo.hora}}</td>
+                    <td>{{vuelo.precio}}</td>
                   </tr>
 
                 </tbody>
               </table>
+              <ul class="nav nav-tabs">
+                <li  v-bind:class="{'active' :('tab_reg_reserva' === tabSecActiva)}"><a href="#" v-on:click="tabSecActiva='tab_reg_reserva';limpiar();">Reserva</a></li>
+                <li v-bind:class="{'active' :('tab_reg_user' === tabSecActiva)}"><a href="#" v-on:click="tabSecActiva='tab_reg_user';limpiar();" >Nuevo usuario</a></li>
+              </ul>
+
+              <div id="div_reg_reserva" v-if="('tab_reg_reserva' === tabSecActiva)" class="panel panel-default">
+              <template v-if="vueloReserva.id">
+                <div class="panel-body">
+                  <form class="form-inline">
+                    <div v-if="mensajeProceso" class="alert alert-danger">
+                           <strong>{{mensajeProceso}}</strong>
+                     </div>
+                    <div class="form-group">
+                    <label for="identificacion_b">Nro identificacion:</label>
+                    <input type="text" class="form-control" id="identificacion_b" v-model="identificacionUsuarioBusqueda">
+                    </div>
+                    <button type="button" class="btn btn-default" v-on:click="consultarUsuario()">Consultar</button>
+                 </form>
+                 <hr>
+                 <template v-if="usuarioConsulta.nombreCompleto">
+                   <div class="form-group">
+                   <label for="identificacion">Nombre:</label>
+                     {{usuarioConsulta.nombreCompleto}}
+                   </div>
+                   <div class="form-group">
+                   <label for="identificacion">Edad:</label>
+                     {{usuarioConsulta.edad}}
+                   </div>
+                   <button type="button" name="button" v-on:click="registrarReserva()">Deseo hacer la reserva</button>
+                 </template>
+                 <template  v-if="mensajeProcesoReserva" >
+                   <div  class="alert alert-success">
+                          <strong>{{mensajeProcesoReserva}}</strong>
+                    </div>
+                 </template>
+                </div>
+              </template>
+              <template v-else>
+                <hr>
+                <div  class="alert alert-warning">
+                       <strong>Por favor seleccione un vuelo</strong>
+                 </div>
+              </template>
+
+              </template>
+              </div>
+
+              <div id="div_reg_usuario" v-if="('tab_reg_user' === tabSecActiva)" class="panel panel-default">
+                <div class="panel-body">
+                  <div class="alert alert-success" v-if="mensajeProceso" >
+                   <strong>{{mensajeProceso}}</strong>
+                  </div>
+
+                    <div class="form-group">
+                    <label for="identificacion">Nro identificacion:</label>
+                    <input type="text" class="form-control" id="identificacion" v-model="nuevoUsuario.identificacion">
+                    </div>
+                    <div class="form-group">
+                    <label for="identificacion">Nombre Completo:</label>
+                    <input type="text" class="form-control" id="nombreCompleto" v-model="nuevoUsuario.nombreCompleto">
+                    </div>
+                    <div class="form-group">
+                    <label for="edad">Edad:</label>
+                    <input type="number" class="form-control" id="edad" v-model="nuevoUsuario.edad">
+                    </div>
+                    <button type="button" class="btn btn-default" v-on:click="registrarUsuario()">Registrar</button>
+
+                </div>
+              </div>
+
            </div>
-                 
+
           </div>
         </div>
         <!--- tab reservas -->
         <div id="div_reserva"  v-if="('tbreserva' === tabActiva)" class="panel panel-default">
-          <div class="panel-body"> <p>reservas.</p></div>
+          <div class="panel-body">
+            <form class="form-inline">
+              <div v-if="mensajeProceso" class="alert alert-danger">
+                     <strong>{{mensajeProceso}}</strong>
+               </div>
+              <div class="form-group">
+              <label for="identificacion_b">Nro identificacion:</label>
+              <input type="text" class="form-control" id="identificacion_br" v-model="identificacionUsuarioBusqueda">
+              </div>
+              <button type="button" class="btn btn-default" v-on:click="consultarReservas()">Consultar</button>
+              <div v-if="reservasUsuario.length > 0" >
+                <table class="table">
+                   <thead>
+                     <tr>
+                       <th>Codigo</th>
+                        <th>Origen</th>
+                      <th>Destino</th>
+                       <th>Duraci&oacute;n(Minutos)</th>
+                       <th>Fecha</th>
+                       <th>Hora</th>
+
+                     </tr>
+                   </thead>
+                   <tbody>
+                     <tr v-for="reserva in reservasUsuario">                       
+                       <td>{{reserva.vuelo.id +"-"+reserva.vuelo.numeroAvion}}</td>
+                       <td>{{reserva.vuelo.tarifaVuelo.ciudadOrigen}}</td>
+                       <td>{{reserva.vuelo.tarifaVuelo.ciudadDestino}}</td>
+                       <td>{{reserva.vuelo.tiempoDuracionMinutos}}</td>
+                       <td>{{reserva.vuelo.fecha}}</td>
+                       <td>{{reserva.vuelo.hora}}</td>
+                     </tr>
+
+                   </tbody>
+                 </table>
+               </div>
+           </form>
+          </div>
         </div>
 
        </div>
